@@ -5,7 +5,7 @@
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball", "oci_image_index")
 
 pkg_tar(
     name = "tar",
@@ -20,7 +20,17 @@ oci_image(
     visibility = ["//visibility:public"],
 )
 
-# This is the target that should be released to the target platform
+# "NEW WAY" of https://github.com/bazel-contrib/rules_oci/pull/531
+# load("@rules_oci//oci:defs.bzl", "oci_image_index")
+# oci_image_index(
+#     name = "image-mp",
+#     images = [":image"],
+#     platforms = [
+#         "@io_bazel_rules_go//go/toolchain:linux_amd64",
+#         "@io_bazel_rules_go//go/toolchain:linux_arm64",
+#     ]
+# )
+
 platform_transition_filegroup(
     name = "transitioned_image",
     srcs = [":image"],
@@ -30,12 +40,21 @@ platform_transition_filegroup(
     }),
 )
 
-# $ bazel run //server-client:tarball
+# $ bazel run //project-backend:tarball
 # $ docker run --rm eu.gcr.io/hermanbanken/example-bazel-monorepo:latest
 oci_tarball(
     name = "tarball",
-    image = ":image",
+    image = ":image-mp",
     repo_tags = ["eu.gcr.io/hermanbanken/example-bazel-monorepo:latest"],
+    visibility = ["//test:__pkg__"],
+)
+
+# $ bazel run //project-backend:tarball-mp
+# $ docker run --rm eu.gcr.io/hermanbanken/example-bazel-monorepo:latest-mp
+oci_tarball(
+    name = "tarball-mp",
+    image = ":transitioned_image",
+    repo_tags = ["eu.gcr.io/hermanbanken/example-bazel-monorepo:latest-mp"],
     visibility = ["//test:__pkg__"],
 )
 
@@ -43,7 +62,7 @@ container_structure_test(
     name = "test",
     configs = ["test.yaml"],
     # Use the image built for the exec platform rather than the target platform
-    image = ":image",
+    image = ":image-mp",
 )
 
 # multi-platform image
