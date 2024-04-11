@@ -1,14 +1,10 @@
 "Client module"
-
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@npm//:vite/package_json.bzl", vite_bin = "bin")
 load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
 
-npm_link_all_packages(
-    name = "node_modules",
-    npm_package_lock = ":package-lock.json",
-)
+npm_link_all_packages(name = "node_modules")
 
 CONFIGS = [
     "vite.config.ts",
