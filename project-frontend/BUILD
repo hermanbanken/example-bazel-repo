@@ -7,7 +7,7 @@ load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
 
 npm_link_all_packages(
     name = "node_modules",
-    npm_package_lock = "//client:package-lock.json",
+    npm_package_lock = ":package-lock.json",
 )
 
 CONFIGS = [
@@ -19,7 +19,7 @@ CONFIGS = [
 
 BUILD_DEPS = [
     ":node_modules",
-    "//:package-lock.json",
+    ":package-lock.json",
 ]
 
 copy_to_bin(
@@ -40,14 +40,14 @@ copy_to_bin(
     ]),
 )
 
-# vite_bin.vite(
-#     name = "client",
-#     srcs = BUILD_DEPS + CONFIGS + [":vite_srcs_export"],
-#     args = ["build --config vite.config.ts"],
-#     chdir = package_name(),
-#     out_dirs = ["dist"],
-#     visibility = ["//visibility:public"],
-# )
+vite_bin.vite(
+    name = "client",
+    srcs = BUILD_DEPS + CONFIGS + [":vite_srcs_export"],
+    args = ["build --config vite.config.ts"],
+    chdir = package_name(),
+    out_dirs = ["dist"],
+    visibility = ["//visibility:public"],
+)
 
 vitest_bin.vitest_test(
     name = "vitest",

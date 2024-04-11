@@ -3,9 +3,9 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "server_lib",
     srcs = ["main.go"],
-    importpath = "github.com/hermanbanken/example-bazel-monorepo/projectB/cmd/server",
+    importpath = "github.com/hermanbanken/example-bazel-monorepo/project-backend/cmd/server",
     visibility = ["//visibility:private"],
-    deps = ["//projectB/pkg/lib"],
+    deps = ["//project-backend/pkg/lib"],
 )
 
 go_binary(

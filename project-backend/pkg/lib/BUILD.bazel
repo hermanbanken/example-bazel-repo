@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "lib",
     srcs = ["lib.go"],
-    importpath = "github.com/hermanbanken/example-bazel-monorepo/projectB/pkg/lib",
+    importpath = "github.com/hermanbanken/example-bazel-monorepo/project-backend/pkg/lib",
     visibility = ["//visibility:public"],
 )
 

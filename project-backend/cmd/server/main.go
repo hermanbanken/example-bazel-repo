@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hermanbanken/example-bazel-monorepo/projectB/pkg/lib"
+	"github.com/hermanbanken/example-bazel-monorepo/project-backend/pkg/lib"
 )
 
 func main() {

@@ -9,7 +9,7 @@ load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
 
 pkg_tar(
     name = "tar",
-    srcs = ["//projectB/cmd/server"],
+    srcs = ["//project-backend/cmd/server"],
 )
 
 oci_image(
