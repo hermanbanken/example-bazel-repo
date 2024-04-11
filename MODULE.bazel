@@ -1,0 +1,70 @@
+module(
+    name = "example",
+    repo_name = "com_github_com_hermanbanken_example_bazel_monorepo",
+)
+
+### JS
+
+bazel_dep(name = "aspect_bazel_lib", version = "1.40.0")
+bazel_dep(name = "aspect_rules_js", version = "1.35.0")
+bazel_dep(name = "aspect_rules_ts", version = "1.4.5")
+bazel_dep(name = "aspect_rules_esbuild", version = "0.19.0")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+npm.npm_translate_lock(
+    name = "npm",
+    npm_package_lock = "//:package-lock.json",
+    npmrc = "//:.npmrc",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")
+
+rules_ts_ext = use_extension(
+    "@aspect_rules_ts//ts:extensions.bzl",
+    "ext",
+    dev_dependency = True,
+)
+rules_ts_ext.deps(ts_version_from = "//:package.json")
+use_repo(rules_ts_ext, "npm_typescript")
+
+### GO
+# bazel_dep(name = "rules_go", version = "0.46.0")
+# bazel_dep(name = "gazelle", version = "0.35.0")
+bazel_dep(name = "rules_go", version = "0.46.0")
+bazel_dep(name = "gazelle", version = "0.35.0")
+
+# An isolated extension usage does not share any tags with any other usage and results in a
+# completely separate set of repos. We explicitly use different directives and patches here to
+# verify that they do not interfere with those of the root test module.
+go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "//:go.mod")
+
+### OCI (docker) images
+# For testing, we also recommend https://registry.bazel.build/modules/container_structure_test
+
+bazel_dep(name = "rules_pkg", version = "0.10.1")
+bazel_dep(name = "rules_oci", version = "1.7.5")
+bazel_dep(name = "container_structure_test", version = "1.15.0")
+bazel_dep(name = "platforms", version = "0.0.8")
+
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "distroless_base",
+    # 'latest' is not reproducible, but it's convenient.
+    # During the build we print a WARNING message that includes recommended 'digest' and 'platforms'
+    # values which you can use here in place of 'tag' to pin for reproducibility.
+    # tag = "latest",
+    digest = "sha256:9bc3117a99c731a41200a28774405125cb6fbda1819f4a1af88bd3bfad5dcf32",
+    image = "gcr.io/distroless/base",
+    platforms = [
+        "linux/amd64",
+        "linux/arm64/v8",
+        "linux/arm64/v7",
+        "linux/s390x",
+        "linux/ppc64le",
+    ],
+)
+
+# For each oci.pull call, repeat the "name" here to expose them as dependencies.
+use_repo(oci, "distroless_base")

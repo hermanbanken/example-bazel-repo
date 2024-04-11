@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "lib",
+    srcs = ["lib.go"],
+    importpath = "github.com/hermanbanken/example-bazel-monorepo/projectB/pkg/lib",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "go_default_library",
+    actual = ":lib",
+    visibility = ["//visibility:public"],
+)
