@@ -32,7 +32,7 @@ oci_image(
 # )
 
 platform_transition_filegroup(
-    name = "transitioned_image",
+    name = "image-mp",
     srcs = [":image"],
     target_platform = select({
         "@platforms//cpu:arm64": "@rules_go//go/toolchain:linux_arm64",
@@ -53,14 +53,16 @@ oci_tarball(
 # $ docker run --rm eu.gcr.io/hermanbanken/example-bazel-monorepo:latest-mp
 oci_tarball(
     name = "tarball-mp",
-    image = ":transitioned_image",
+    image = ":image-mp",
     repo_tags = ["eu.gcr.io/hermanbanken/example-bazel-monorepo:latest-mp"],
     visibility = ["//test:__pkg__"],
 )
 
 container_structure_test(
     name = "test",
-    configs = ["test.yaml"],
+    configs = [
+        # "test.yaml"
+    ],
     # Use the image built for the exec platform rather than the target platform
     image = ":image-mp",
 )

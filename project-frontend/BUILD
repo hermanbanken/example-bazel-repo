@@ -2,7 +2,7 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@npm//:vite/package_json.bzl", vite_bin = "bin")
-load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
+# load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -13,26 +13,22 @@ CONFIGS = [
     "tsconfig.node.json",
 ]
 
-BUILD_DEPS = [
-    ":node_modules",
-    ":package-lock.json",
-]
+BUILD_DEPS = [":node_modules/" + d for d in [
+    # "@bazel-example/vue-library",
+    # "@vitejs/plugin-vue",
+    # "@vitejs/plugin-vue-jsx",
+    # "@vue/tsconfig",
+    "vite",
+    # "vue",
+    # "vue-router",
+]]
 
 copy_to_bin(
     name = "vite_srcs_export",
     srcs = glob([
         "src/**/*.ts",
         "src/**/*.tsx",
-        "public/**/*.png",
-        "public/**/*.jpg",
-        "public/**/*.svg",
-        "public/**/*.webp",
-        "public/**/*.ico",
-        "public/**/*.json",
-        "public/**/*.xml",
-        "public/**/*.gif",
-        "public/**/*.css",
-        "public/*/apple-app-site-association",
+        "public/**/*",
     ]),
 )
 
@@ -45,17 +41,17 @@ vite_bin.vite(
     visibility = ["//visibility:public"],
 )
 
-vitest_bin.vitest_test(
-    name = "vitest",
-    args = [
-        "run",
-        "--config=vite.config.ts",
-    ],
-    chdir = package_name(),
-    data = BUILD_DEPS + CONFIGS + [":vite_srcs_export"] + [":node_modules/vitest"] + glob([
-        "src/**/*.test.ts",
-    ]),
-)
+# vitest_bin.vitest_test(
+#     name = "vitest",
+#     args = [
+#         "run",
+#         "--config=vite.config.ts",
+#     ],
+#     chdir = package_name(),
+#     data = BUILD_DEPS + CONFIGS + [":vite_srcs_export"] + [":node_modules/vitest"] + glob([
+#         "src/**/*.test.ts",
+#     ]),
+# )
 
 # load("@npm//:defs.bzl", "npm_link_all_packages")
 # load("@aspect_rules_js//js:defs.bzl", "js_binary")

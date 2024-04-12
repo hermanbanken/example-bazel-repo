@@ -5,29 +5,23 @@ module(
 
 ### JS
 
-bazel_dep(name = "aspect_bazel_lib", version = "1.40.0")
+bazel_dep(name = "aspect_bazel_lib", version = "1.42.2")
 bazel_dep(name = "aspect_rules_js", version = "1.35.0")
 bazel_dep(name = "aspect_rules_ts", version = "1.4.5")
 bazel_dep(name = "aspect_rules_esbuild", version = "0.19.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 
+# https://github.com/bazelbuild/examples/blob/main/frontend/MODULE.bazel
 # https://github.com/aspect-build/rules_js/blob/main/e2e/npm_translate_package_lock/MODULE.bazel
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
-# npm.npm_translate_lock(
-#     name = "npm",
-#     npm_package_lock = "//project-frontend:package-lock.json",
-#     npmrc = "//:.npmrc",
-#     verify_node_modules_ignored = "//:.bazelignore",
-# )
-# npm.npm_translate_lock(
-#     name = "npm",
-#     data = ["//:package.json"],
-#     npm_package_lock = "//:package-lock.json",
-#     npmrc = "//:.npmrc",
-#     quiet = False,
-#     update_pnpm_lock = False,
-#     verify_node_modules_ignored = "//:.bazelignore",
-# )
+npm.npm_translate_lock(
+    name = "npm",
+    data = ["//project-frontend:package.json"],
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//project-frontend:pnpm-lock.yaml",
+    npm_package_lock = "//project-frontend:package-lock.json",
+    update_pnpm_lock = True,
+)
 use_repo(npm, "npm")
 
 rules_ts_ext = use_extension(
@@ -35,7 +29,7 @@ rules_ts_ext = use_extension(
     "ext",
     dev_dependency = True,
 )
-rules_ts_ext.deps(ts_version_from = "//:package.json")
+rules_ts_ext.deps(ts_version_from = "//:project-frontend:package.json")
 use_repo(rules_ts_ext, "npm_typescript")
 
 ### GO
